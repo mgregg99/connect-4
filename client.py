@@ -216,6 +216,23 @@ def local_game():
     print_board(gameboard)
 
 def multiplayer_game():
+
+    def print_board(gameString):
+        emote = ''
+        for letter in gameString:
+            
+            if letter == '0':
+                emote += '⚫'
+            elif letter == '1':
+                emote += '🔴'
+            elif letter == '2':
+                emote += '🟡'
+            if len(emote) == 7:
+                print(emote)
+                emote = ''
+        
+
+
     host = input('Enter the hostname or ip: ')
 
     # check if the host is valid
@@ -238,12 +255,15 @@ def multiplayer_game():
     key = response['key']
     gamePath = response['con']
     color = response['color']
+    dot = ''
 
     print('Connected to host\n')
     if color == 'red':
         print('You are red 🔴')
+        dot = '🔴'
     elif color == 'yellow':
         print('You are yellow 🟡')
+        dot = '🟡'
 
     print('waiting for other player to connect...')
     waiting = True
@@ -257,7 +277,25 @@ def multiplayer_game():
             waiting = False
     print('Other player connected')
     print('Starting game...')
-    print(response['board'])
+    
+    print_board(response['board'])
+    
+    game = True
+    while game:
+        if response['turn'] == color:
+            print('Your turn ' + dot)
+            print_board(response['board'])
+            re = input ('Enter the coloumn number: ')
+        else:
+            print('Other player\'s turn ' + dot)
+            notTurn = True
+            while notTurn:
+                time.sleep(4)
+                r = requests.get('http://' + host + ':3000/' + gamePath)
+                response = r.json()
+                if response['turn'] == color:
+                    notTurn = False
+                
         
 
     

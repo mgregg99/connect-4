@@ -1,6 +1,7 @@
 import random
 from flask import Flask, render_template
 import json
+import os
 
 app = Flask(__name__)
 newGame = True
@@ -12,9 +13,8 @@ gameboard =[[0, 0, 0, 0, 0, 0, 0], # 0
             [0, 0, 0, 0, 0, 0, 0], # 3
             [0, 0, 0, 0, 0, 0, 0], # 4
             [0, 0, 0, 0, 0, 0, 0]] # 5
-game1 = []
 
-newGame = True
+player = 'red'
 
 def boardToString(board):
     string = ""
@@ -33,10 +33,19 @@ def game():
     wait = 'true'
     if len(keys) == 2:
         wait = 'false'
-    if game1 == False:
-        game1 = gameboard
-        
-    return json.dumps({'wait': wait, 'board': boardToString(game1)})
+        f = open('game/game1.txt', 'w')
+        f.write(boardToString(gameboard))
+        f.close()
+    
+    game1 = []
+    try:
+        f = open('game/game1.txt', 'r')
+        game1 = f.read()
+        f.close()
+    except:
+        a = 1
+
+    return json.dumps({'wait': wait, 'board': game1, 'turn': player})
 
 @app.route("/connect")
 def connect():
@@ -53,7 +62,8 @@ def connect():
 @app.route("/clear")
 def clear():
     keys.clear()
-    return 'done'
+    os.remove("game/game1.txt")
+    return 'cleared'
 
 @app.route("/test")
 def test():
