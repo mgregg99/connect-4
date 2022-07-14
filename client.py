@@ -216,6 +216,7 @@ def local_game():
     print_board(gameboard)
 
 def multiplayer_game():
+    port = 3001
 
     def print_board(gameString):
         emote = ''
@@ -236,7 +237,7 @@ def multiplayer_game():
     host = input('Enter the hostname or ip: ')
 
     # check if the host is valid
-    r = requests.get('http://' + host + ':3000/test')
+    r = requests.get('http://' + host + ':' + str(port) + '/test')
     if r.status_code == 200:
         print('Host is valid')
     else:
@@ -244,13 +245,16 @@ def multiplayer_game():
         return
     
     print('Connecting to host...')
-    r = requests.get('http://' + host + ':3000/connect')
-    
-    if r.content == 'full':
-        print('Host is full')
-        return
-    # read the json response
+    r = requests.get('http://' + host + ':' + str(port) + '/connect')
     response = r.json()
+    try:
+        if response['full'] == 'full':
+            print('Host is full')
+            return
+    except:
+        a=1
+    # read the json response
+    
     time.sleep(1)
     key = response['key']
     gamePath = response['con']
@@ -268,7 +272,7 @@ def multiplayer_game():
     print('waiting for other player to connect...')
     waiting = True
     while waiting:
-        r = requests.get('http://' + host + ':3000/' + gamePath)
+        r = requests.get('http://' + host + ':' + str(port) + '/' + gamePath)
         response = r.json()
         if response['wait'] == 'true':
             print('...')
@@ -278,30 +282,35 @@ def multiplayer_game():
     print('Other player connected')
     print('Starting game...')
     
-    print_board(response['board'])
-    
     game = True
     while game:
+
+        if response['winner'] == 'red':
+            print('🔴 Red player wins')
+            print_board(response['board'])
+            break
+        elif response['winner'] == 'yellow':
+            print('🟡 Yellow player wins')
+            print_board(response['board'])
+            break
+
         if response['turn'] == color:
             print('Your turn ' + dot)
             print_board(response['board'])
             re = input ('Enter the coloumn number: ')
+            r = requests.post('http://' + host + ':' + str(port) + '/' + gamePath + '/post', data={'key': key, 'col': re})
+            time.sleep(1)
         else:
-            print('Other player\'s turn ' + dot)
+            print('Other player\'s turn ')
             notTurn = True
             while notTurn:
                 time.sleep(4)
-                r = requests.get('http://' + host + ':3000/' + gamePath)
+                r = requests.get('http://' + host + ':' + str(port) + '/' + gamePath)
                 response = r.json()
                 if response['turn'] == color:
                     notTurn = False
-                
-        
-
-    
-
-
-
+        r = requests.get('http://' + host + ':' + str(port) + '/' + gamePath)
+        response = r.json()
 
 
 
