@@ -1,3 +1,8 @@
+import requests
+import time
+
+
+
 def local_game():
     #            0  1  2  3  4  5  6
     gameboard =[[0, 0, 0, 0, 0, 0, 0], # 0
@@ -209,6 +214,53 @@ def local_game():
 
 
     print_board(gameboard)
+
+def multiplayer_game():
+    host = input('Enter the hostname or ip: ')
+
+    # check if the host is valid
+    r = requests.get('http://' + host + ':3000/test')
+    if r.status_code == 200:
+        print('Host is valid')
+    else:
+        print('Host is invalid')
+        return
+    
+    print('Connecting to host...')
+    r = requests.get('http://' + host + ':3000/connect')
+    
+    if r.content == 'full':
+        print('Host is full')
+        return
+    # read the json response
+    response = r.json()
+    time.sleep(1)
+    key = response['key']
+    gamePath = response['con']
+    color = response['color']
+
+    print('Connected to host\n')
+    if color == 'red':
+        print('You are red 🔴')
+    elif color == 'yellow':
+        print('You are yellow 🟡')
+
+    print('waiting for other player to connect...')
+    waiting = True
+    while waiting:
+        r = requests.get('http://' + host + ':3000/' + gamePath)
+        response = r.json()
+        if response['wait'] == 'true':
+            print('...')
+            time.sleep(3)
+        else:
+            waiting = False
+    print('Other player connected')
+    print('Starting game...')
+    print(response['board'])
+        
+
+    
 
 
 

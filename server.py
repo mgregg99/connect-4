@@ -3,20 +3,43 @@ from flask import Flask, render_template
 import json
 
 app = Flask(__name__)
-
+newGame = True
 keys = []
+#            0  1  2  3  4  5  6
+gameboard =[[0, 0, 0, 0, 0, 0, 0], # 0
+            [0, 0, 0, 0, 0, 0, 0], # 1
+            [0, 0, 0, 0, 0, 0, 0], # 2
+            [0, 0, 0, 0, 0, 0, 0], # 3
+            [0, 0, 0, 0, 0, 0, 0], # 4
+            [0, 0, 0, 0, 0, 0, 0]] # 5
+game1 = []
+
+newGame = True
+
+def boardToString(board):
+    string = ""
+    for row in board:
+        for col in row:
+            string += str(col)
+    return string
 
 @app.route('/')
 @app.route('/about')
 def about():
     return render_template('info.html')
 
-@app.route("/game")
+@app.route('/game')
 def game():
-    return str(len(keys))
+    wait = 'true'
+    if len(keys) == 2:
+        wait = 'false'
+    if game1 == False:
+        game1 = gameboard
+        
+    return json.dumps({'wait': wait, 'board': boardToString(game1)})
 
-@app.route("/ready")
-def ready():
+@app.route("/connect")
+def connect():
     if len(keys)  < 2:
         key = str(random.random())
         keys.append(key)
@@ -31,6 +54,10 @@ def ready():
 def clear():
     keys.clear()
     return 'done'
+
+@app.route("/test")
+def test():
+    return "test"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=3000)
