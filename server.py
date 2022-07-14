@@ -54,11 +54,9 @@ class gameClass:
             row -= 1
         temp = ''
         for line in board:
-            print(line)
             for i in line:
                 temp += str(i)
         self.gameboard = temp
-        print(temp)
         self.player = nextplayer
         return 'success'
 
@@ -69,7 +67,6 @@ class gameClass:
         for letter in self.gameboard:
             temp.append(int(letter))
             if len(temp) == 7:
-                print(temp)
                 board.append(temp)
                 temp = []
         
