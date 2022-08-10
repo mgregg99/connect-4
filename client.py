@@ -313,17 +313,10 @@ def multiplayer_game():
         response = r.json()
 
 
-
-
-
-
-
-
-
 # bootloop
 game = True
 while game:
-    userIn = input('Do you want to play a local or multiplayer? (y/n)\n 1. Local\n 2. Multiplayer\n')
+    userIn = input('Do you want to play a local or multiplayer?\n 1. Local\n 2. Multiplayer\n')
     if userIn == '1':
         local_game()
         game = False
